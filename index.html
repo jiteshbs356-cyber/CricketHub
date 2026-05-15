@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏏 Cricket Hub — IPL 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/portal.css">
+<!-- AUTO-REDIRECT TO LOCAL SERVER WHEN OPENED AS FILE -->
+<script>
+if (window.location.protocol === 'file:' && window.top === window) {
+  try {
+    window.location.href = 'http://localhost:3000';
+  } catch (e) {
+    console.warn('Redirect blocked:', e);
+  }
+}
+</script>
+<!-- LOGIN GATE -->
+<script>
+(function(){
+  try{
+    const u=JSON.parse(sessionStorage.getItem('ipl_current_user')||localStorage.getItem('ipl_current_user_remember')||'null');
+    if(!u){window.location.replace('auth.html');}
+  }catch(e){window.location.replace('auth.html');}
+})();
+</script>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="brand-icon">🏏</div>
+    <div class="brand-text">
+      <span class="brand-main">Cricket Hub</span>
+      <span class="brand-sub">IPL 2026 OFFICIAL PORTAL</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <button class="nav-tab active" data-section="portal"  onclick="switchSection('portal',this)">🏠 HOME</button>
+    <button class="nav-tab" data-section="tickets" onclick="switchSection('tickets',this)">🎟️ BOOK TICKETS</button>
+    <button class="nav-tab" data-section="jerseys" onclick="switchSection('jerseys',this)">👕 BUY JERSEYS</button>
+    <button class="nav-tab" data-section="merch"   onclick="switchSection('merch',this)">🛍️ MERCHANDISE</button>
+    <button class="nav-tab" data-section="players" onclick="switchSection('players',this)">👤 PLAYERS</button>
+    <button class="nav-tab" data-section="stats"   onclick="switchSection('stats',this)">📊 STATISTICS</button>
+    <button class="nav-tab" data-section="compare" onclick="switchSection('compare',this)">⚖️ COMPARE</button>
+    <button class="nav-tab" data-section="users"   onclick="switchSection('users',this)">🗄️ USER DB</button>
+  </div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">🛒 <span class="cart-badge" id="cart-count">0</span></button>
+    <div class="user-nav-pill" id="user-nav-pill" data-section="myaccount" style="display:none" onclick="switchSection('myaccount',document.querySelector('[data-section=myaccount]'))" title="My Account">
+      <span class="unp-avatar" id="unp-avatar">?</span>
+      <span class="unp-name"   id="unp-name">User</span>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">🏆 IPL 2026</div>
+  <div class="ticker-track">
+    <div class="ticker-content" id="ticker-content">
+      🎟️ Match-day tickets now available — Book early for best seats &nbsp;·&nbsp;
+      👕 RR, GT, MI, CSK new season jerseys in stock &nbsp;·&nbsp;
+      🏆 IPL 2026 Season is LIVE — RR leads points table &nbsp;·&nbsp;
+      ⭐ Virat Kohli signed bat — Limited edition available now &nbsp;·&nbsp;
+      🎁 Free shipping on orders above ₹999 &nbsp;·&nbsp;
+      📦 Official BCCI licensed merchandise only
+    </div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ══════ HOME ══════ -->
+<section class="section active" id="sec-portal">
+  <div class="portal-hero">
+    <div class="portal-hero-bg"></div>
+    <div class="portal-hero-content">
+      <div class="portal-hero-eyebrow">🏆 CRICKET HUB · TATA IPL 2026 — SEASON 19</div>
+      <h1 class="portal-hero-title">YOUR COMPLETE<br><span class="title-accent">IPL EXPERIENCE</span></h1>
+      <p class="portal-hero-desc">Book match tickets · Buy official jerseys · Shop merchandise · Explore player stats — all in one place</p>
+      <div class="portal-hero-ctas">
+        <button class="cta-btn primary"      onclick="switchSection('tickets',document.querySelector('[data-section=tickets]'))">🎟️ BOOK TICKETS</button>
+        <button class="cta-btn accent-green" onclick="switchSection('jerseys',document.querySelector('[data-section=jerseys]'))">👕 BUY JERSEYS</button>
+        <button class="cta-btn secondary"    onclick="switchSection('players',document.querySelector('[data-section=players]'))">👤 PLAYER STATS</button>
+      </div>
+    </div>
+    <div class="portal-hero-stats">
+      <div class="hs-card"><div class="hs-num">10</div><div class="hs-label">Teams</div></div>
+      <div class="hs-card"><div class="hs-num">74</div><div class="hs-label">Matches</div></div>
+      <div class="hs-card"><div class="hs-num">10+</div><div class="hs-label">Venues</div></div>
+      <div class="hs-card"><div class="hs-num">200+</div><div class="hs-label">Players</div></div>
+    </div>
+  </div>
+  <div class="portal-cards-grid">
+    <div class="portal-nav-card ticket-card" onclick="switchSection('tickets',document.querySelector('[data-section=tickets]'))">
+      <div class="pnc-icon">🎟️</div><div class="pnc-title">BOOK TICKETS</div>
+      <div class="pnc-desc">Reserve seats for upcoming IPL matches across all 10 venues</div><div class="pnc-cta">Book Now →</div>
+    </div>
+    <div class="portal-nav-card jersey-card" onclick="switchSection('jerseys',document.querySelector('[data-section=jerseys]'))">
+      <div class="pnc-icon">👕</div><div class="pnc-title">BUY JERSEYS</div>
+      <div class="pnc-desc">Official team jerseys, player-name prints, kids sizes available</div><div class="pnc-cta">Shop Now →</div>
+    </div>
+    <div class="portal-nav-card merch-card" onclick="switchSection('merch',document.querySelector('[data-section=merch]'))">
+      <div class="pnc-icon">🛍️</div><div class="pnc-title">MERCHANDISE</div>
+      <div class="pnc-desc">Bats, signed memorabilia, collectibles and more</div><div class="pnc-cta">Explore →</div>
+    </div>
+    <div class="portal-nav-card stats-card" onclick="switchSection('stats',document.querySelector('[data-section=stats]'))">
+      <div class="pnc-icon">📊</div><div class="pnc-title">PLAYER STATS</div>
+      <div class="pnc-desc">Deep dive into career stats, graphs and head-to-head comparisons</div><div class="pnc-cta">View Stats →</div>
+    </div>
+  </div>
+  <div class="section-title-row" style="margin-top:2.5rem"><h2 class="section-title">🔥 HOT DEALS & OFFERS</h2></div>
+  <div class="featured-offers-grid" id="featured-offers-grid"></div>
+  <div class="section-title-row" style="margin-top:2rem">
+    <h2 class="section-title">⭐ TOP SELLERS</h2>
+    <button class="view-all-btn" onclick="switchSection('jerseys',document.querySelector('[data-section=jerseys]'))">View All →</button>
+  </div>
+  <div class="top-sellers-grid" id="top-sellers-grid"></div>
+  <div class="offers-strip">
+    <div class="offer-item"><span class="offer-icon">🚀</span><span>FREE SHIPPING on orders ₹999+</span></div>
+    <div class="offer-item"><span class="offer-icon">🏷️</span><span>EARLY BIRD — 15% off tickets 7+ days ahead</span></div>
+    <div class="offer-item"><span class="offer-icon">🎁</span><span>BUY 2 jerseys — Get captain's wristband FREE</span></div>
+    <div class="offer-item"><span class="offer-icon">💳</span><span>0% EMI on orders above ₹3000</span></div>
+    <div class="offer-item"><span class="offer-icon">🎟️</span><span>COMBO — Ticket + Jersey bundle saves ₹500</span></div>
+  </div>
+</section>
+
+<!-- ══════ MY ACCOUNT ══════ -->
+<section class="section" id="sec-myaccount">
+  <div class="section-title-row">
+    <div>
+      <h2 class="section-title">👤 MY ACCOUNT</h2>
+      <p class="section-sub">View profile details, order history, tickets, and account status.</p>
+    </div>
+  </div>
+  <div id="myaccount-inner" style="min-height:320px;padding:0 0 2rem"></div>
+</section>
+
+<!-- ══════ TICKETS ══════ -->
+<section class="section" id="sec-tickets">
+  <div class="section-title-row">
+    <div><h2 class="section-title">🎟️ BOOK MATCH TICKETS</h2><p class="section-sub">Official IPL 2026 tickets — select match, stand and seats</p></div>
+    <div class="ticket-legend"><span class="leg-dot avail"></span>Available<span class="leg-dot fast"></span>Fast<span class="leg-dot sold"></span>Sold Out</div>
+  </div>
+  <div class="ticket-filters">
+    <select class="filter-select" id="ticket-team-filter" onchange="filterTickets()">
+      <option value="">All Teams</option><option>MI</option><option>CSK</option><option>RCB</option><option>KKR</option><option>DC</option><option>PBKS</option><option>RR</option><option>SRH</option><option>GT</option><option>LSG</option>
+    </select>
+    <select class="filter-select" id="ticket-venue-filter" onchange="filterTickets()">
+      <option value="">All Venues</option>
+      <option>Wankhede Stadium, Mumbai</option><option>MA Chidambaram Stadium, Chennai</option>
+      <option>M Chinnaswamy Stadium, Bengaluru</option><option>Eden Gardens, Kolkata</option>
+      <option>Narendra Modi Stadium, Ahmedabad</option><option>Sawai Mansingh Stadium, Jaipur</option>
+    </select>
+    <input type="text" class="search-input" id="ticket-search" placeholder="🔍 Search match..." oninput="filterTickets()" style="max-width:220px">
+  </div>
+  <div class="matches-ticket-grid" id="ticket-matches-grid"></div>
+</section>
+
+<!-- ══════ JERSEYS ══════ -->
+<section class="section" id="sec-jerseys">
+  <div class="section-title-row">
+    <div><h2 class="section-title">👕 OFFICIAL IPL JERSEYS</h2><p class="section-sub">100% official BCCI licensed · Authentic fabric · Player-name printing available</p></div>
+    <button class="cart-view-btn" onclick="openCart()">🛒 View Cart (<span id="jersey-cart-count">0</span>)</button>
+  </div>
+  <div class="jersey-filters">
+    <div class="jf-tabs" id="jersey-team-tabs"></div>
+    <div class="jf-right">
+      <select class="filter-select" id="jersey-size-filter" onchange="filterJerseys()"><option value="">All Sizes</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+      <select class="filter-select" id="jersey-sort" onchange="filterJerseys()"><option value="default">Sort: Featured</option><option value="price-asc">Price: Low→High</option><option value="price-desc">Price: High→Low</option></select>
+    </div>
+  </div>
+  <div class="jersey-grid" id="jersey-grid"></div>
+</section>
+
+<!-- ══════ MERCHANDISE ══════ -->
+<section class="section" id="sec-merch">
+  <div class="section-title-row">
+    <div><h2 class="section-title">🛍️ IPL MERCHANDISE STORE</h2><p class="section-sub">Bats · Signed memorabilia · Collectibles · Fan accessories</p></div>
+    <button class="cart-view-btn" onclick="openCart()">🛒 View Cart (<span id="merch-cart-count">0</span>)</button>
+  </div>
+  <div class="merch-cat-tabs">
+    <button class="mct-btn active" onclick="filterMerch('all',this)">All Items</button>
+    <button class="mct-btn" onclick="filterMerch('bats',this)">🏏 Bats</button>
+    <button class="mct-btn" onclick="filterMerch('signed',this)">✍️ Signed</button>
+    <button class="mct-btn" onclick="filterMerch('accessories',this)">⌚ Accessories</button>
+    <button class="mct-btn" onclick="filterMerch('collectibles',this)">🏆 Collectibles</button>
+  </div>
+  <div class="merch-grid" id="merch-grid"></div>
+</section>
+
+<!-- ══════ PLAYERS ══════ -->
+<section class="section" id="sec-players">
+  <div class="section-title-row">
+    <div><h2 class="section-title">👤 PLAYERS</h2><p class="section-sub">Browse the IPL player database with filters, search and career summaries.</p></div>
+    <button class="view-all-btn" type="button" onclick="openAddModal()">Add Player</button>
+  </div>
+  <div class="ticket-filters">
+    <input class="search-input" id="player-search" type="text" placeholder="🔍 Search players, teams or countries" oninput="filterPlayers()">
+    <select class="filter-select" id="role-filter" onchange="filterPlayers()">
+      <option value="">All Roles</option>
+      <option>Batsman</option>
+      <option>Bowler</option>
+      <option>All-rounder</option>
+      <option>Wicket-keeper</option>
+    </select>
+    <select class="filter-select" id="country-filter" onchange="filterPlayers()">
+      <option value="">All Countries</option>
+      <option>India</option>
+      <option>Australia</option>
+      <option>England</option>
+      <option>West Indies</option>
+      <option>New Zealand</option>
+      <option>South Africa</option>
+      <option>Sri Lanka</option>
+    </select>
+    <select class="filter-select" id="team-filter" onchange="filterPlayers()">
+      <option value="">All IPL Teams</option>
+      <option>MI</option>
+      <option>CSK</option>
+      <option>RCB</option>
+      <option>KKR</option>
+      <option>DC</option>
+      <option>PBKS</option>
+      <option>RR</option>
+      <option>SRH</option>
+      <option>GT</option>
+      <option>LSG</option>
+    </select>
+  </div>
+  <div class="players-count" id="players-count">Showing 0 players</div>
+  <div class="players-grid" id="players-grid"></div>
+</section>
+
+<!-- ══════ STATISTICS ══════ -->
+<section class="section" id="sec-stats">
+  <div class="section-title-row">
+    <div><h2 class="section-title">📊 STATISTICS</h2><p class="section-sub">Real statistics, IPL analytics and the full player leaderboard.</p></div>
+  </div>
+  <div class="stat-overview" id="stat-overview"></div>
+  <div class="merch-cat-tabs" id="stats-tabs" style="margin-bottom:1.5rem; gap:0.5rem;">
+    <button class="mct-btn active" onclick="statsTab('ipl', this)">IPL</button>
+    <button class="mct-btn" onclick="statsTab('batting', this)">Batting</button>
+    <button class="mct-btn" onclick="statsTab('bowling', this)">Bowling</button>
+    <button class="mct-btn" onclick="statsTab('teams', this)">Teams</button>
+    <button class="mct-btn" onclick="statsTab('players', this)">Players</button>
+  </div>
+  <div id="tab-ipl" class="charts-row">
+    <div class="chart-card"><div class="chart-card-title">IPL Titles</div><div class="chart-container"><canvas id="chart-titles"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Season Matches</div><div class="chart-container"><canvas id="chart-seasons"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">2026 Points Table</div><div class="chart-container"><canvas id="chart-points"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Venues Hosted</div><div class="chart-container"><canvas id="chart-venues"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Auction Records</div><div class="chart-container"><canvas id="chart-auction"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Total Runs by Season</div><div class="chart-container"><canvas id="chart-season-runs"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Orange Cap Winners</div><div class="chart-container"><canvas id="chart-orange-cap"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Purple Cap Winners</div><div class="chart-container"><canvas id="chart-purple-cap"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Average Run Rate</div><div class="chart-container"><canvas id="chart-run-rate"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Win Percentage</div><div class="chart-container"><canvas id="chart-win-pct"></canvas></div></div>
+  </div>
+  <div id="tab-batting" class="charts-row" style="display:none">
+    <div class="chart-card"><div class="chart-card-title">IPL Run Scorers</div><div class="chart-container"><canvas id="chart-ipl-runs"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Batting Average Leaders</div><div class="chart-container"><canvas id="chart-avg"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Strike Rates</div><div class="chart-container"><canvas id="chart-sr"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">IPL Centuries</div><div class="chart-container"><canvas id="chart-ipl-100s"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Highest Scores</div><div class="chart-container"><canvas id="chart-hs"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">ODI Run Scorers</div><div class="chart-container"><canvas id="chart-runs"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Centuries by Country</div><div class="chart-container"><canvas id="chart-centuries"></canvas></div></div>
+  </div>
+  <div id="tab-bowling" class="charts-row" style="display:none">
+    <div class="chart-card"><div class="chart-card-title">IPL Wicket Takers</div><div class="chart-container"><canvas id="chart-ipl-wkts"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Bowling Economy</div><div class="chart-container"><canvas id="chart-economy"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">ODI Wickets</div><div class="chart-container"><canvas id="chart-wickets"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Bowling Types</div><div class="chart-container"><canvas id="chart-bowl-types"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Fastest Bowler Speeds</div><div class="chart-container"><canvas id="chart-speed"></canvas></div></div>
+  </div>
+  <div id="tab-teams" class="charts-row" style="display:none">
+    <div class="chart-card"><div class="chart-card-title">Matches Played</div><div class="chart-container"><canvas id="chart-team-matches"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Trophies</div><div class="chart-container"><canvas id="chart-trophies-pie"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Win / Loss</div><div class="chart-container"><canvas id="chart-wl"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Salary Cap</div><div class="chart-container"><canvas id="chart-salary"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Ground Capacity</div><div class="chart-container"><canvas id="chart-capacity"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Team Runs 2026</div><div class="chart-container"><canvas id="chart-team-runs-2026"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">NRR 2026</div><div class="chart-container"><canvas id="chart-nrr"></canvas></div></div>
+  </div>
+  <div id="tab-players" class="charts-row" style="display:none">
+    <div class="chart-card"><div class="chart-card-title">Player Nationalities</div><div class="chart-container"><canvas id="chart-nations"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Player Roles</div><div class="chart-container"><canvas id="chart-roles"></canvas></div></div>
+  </div>
+  <div class="section-title-row" style="margin-top:2rem"><div><h2 class="section-title">🏏 FULL PLAYER RANKINGS</h2><p class="section-sub">Tap any row to open the player's full profile.</p></div></div>
+  <div style="overflow-x:auto;">
+    <table style="width:100%;min-width:1100px;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);color:var(--text-secondary);font-size:0.85rem;">
+          <th style="text-align:left;padding:12px 10px">#</th>
+          <th style="text-align:left;padding:12px 10px">Player</th>
+          <th style="text-align:left;padding:12px 10px">Country</th>
+          <th style="text-align:left;padding:12px 10px">Role</th>
+          <th style="text-align:right;padding:12px 10px">Matches</th>
+          <th style="text-align:right;padding:12px 10px">Runs</th>
+          <th style="text-align:right;padding:12px 10px">Avg</th>
+          <th style="text-align:right;padding:12px 10px">SR</th>
+          <th style="text-align:right;padding:12px 10px">HS</th>
+          <th style="text-align:right;padding:12px 10px">100s</th>
+          <th style="text-align:right;padding:12px 10px">50s</th>
+          <th style="text-align:right;padding:12px 10px">IPL Runs</th>
+          <th style="text-align:left;padding:12px 10px">IPL Team</th>
+        </tr>
+      </thead>
+      <tbody id="stats-table-body"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════ COMPARE ══════ -->
+<section class="section" id="sec-compare">
+  <div class="section-title-row">
+    <div><h2 class="section-title">⚖️ COMPARE</h2><p class="section-sub">Select two players to compare career and IPL stats side by side.</p></div>
+  </div>
+  <div class="compare-selectors">
+    <div class="compare-picker"><label for="compare-p1">Player One</label><select id="compare-p1" onchange="updateCompare()"></select></div>
+    <div class="compare-vs-badge">VS</div>
+    <div class="compare-picker"><label for="compare-p2">Player Two</label><select id="compare-p2" onchange="updateCompare()"></select></div>
+  </div>
+  <div id="compare-result"></div>
+</section>
+
+<!-- ══════ USER DB ══════ -->
+<section class="section" id="sec-users">
+  <div class="section-title-row">
+    <div><h2 class="section-title">🗄️ USER DB</h2><p class="section-sub">Registered users, order history, tickets and login activity — manage and export account data.</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <input class="search-input" id="user-search" type="text" placeholder="🔍 Search users by name, email, phone or team" oninput="filterUsersSection()" style="max-width:320px;">
+      <button class="tbm-add-cart-btn" style="background:rgba(240,165,0,0.08);color:var(--accent-gold);border:1px solid rgba(240,165,0,0.25);" onclick="exportUsersCSV()">EXPORT CSV</button>
+      <button class="tbm-add-cart-btn" style="background:rgba(255,31,61,0.08);color:#ff6b80;border:1px solid rgba(255,31,61,0.18);" onclick="clearAllUsers()">CLEAR ALL</button>
+    </div>
+  </div>
+  <div id="users-stats-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:1.5rem"></div>
+  <div class="merch-cat-tabs" id="db-tabs" style="margin-bottom:1rem;gap:0.5rem">
+    <button class="mct-btn active" onclick="showDbTab('accounts',this)">Accounts</button>
+    <button class="mct-btn" onclick="showDbTab('logins',this)">Login Log</button>
+  </div>
+  <div id="db-tab-accounts">
+    <div class="section-title-row" style="margin-bottom:0.75rem"><h3 class="section-sub">Registered Accounts</h3></div>
+    <div style="overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1rem">
+      <table style="width:100%;border-collapse:collapse;min-width:980px">
+        <thead>
+          <tr style="color:var(--text-muted);font-size:0.8rem;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)">
+            <th style="padding:0.85rem 0.75rem">#</th>
+            <th style="padding:0.85rem 0.75rem">User</th>
+            <th style="padding:0.85rem 0.75rem">Phone</th>
+            <th style="padding:0.85rem 0.75rem">Team</th>
+            <th style="padding:0.85rem 0.75rem;text-align:center">Orders</th>
+            <th style="padding:0.85rem 0.75rem;text-align:center">Tickets</th>
+            <th style="padding:0.85rem 0.75rem">Spent</th>
+            <th style="padding:0.85rem 0.75rem;text-align:center">Logins</th>
+            <th style="padding:0.85rem 0.75rem">Last Login</th>
+            <th style="padding:0.85rem 0.75rem">Joined</th>
+            <th style="padding:0.85rem 0.75rem;text-align:center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="db-tab-logins" style="display:none">
+    <div class="section-title-row" style="margin-bottom:0.75rem"><h3 class="section-sub">Login Activity</h3></div>
+    <div style="overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1rem">
+      <table style="width:100%;border-collapse:collapse;min-width:720px">
+        <thead>
+          <tr style="color:var(--text-muted);font-size:0.8rem;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08)">
+            <th style="padding:0.85rem 0.75rem">#</th>
+            <th style="padding:0.85rem 0.75rem">Name</th>
+            <th style="padding:0.85rem 0.75rem">Email</th>
+            <th style="padding:0.85rem 0.75rem">Type</th>
+            <th style="padding:0.85rem 0.75rem">Time</th>
+          </tr>
+        </thead>
+        <tbody id="login-log-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYER DETAIL MODAL -->
+<div class="modal-backdrop" id="player-modal" onclick="closePlayerModal(event)">
+  <div class="modal-box" style="max-width:980px; width:100%; max-height:90vh; overflow-y:auto; padding:1rem;">
+    <button class="modal-close-btn" onclick="closePlayerModalDirect()">✕</button>
+    <div id="modal-inner"></div>
+  </div>
+</div>
+
+<!-- ADD PLAYER MODAL -->
+<div class="modal-backdrop" id="add-modal" onclick="closeAddModal(event)">
+  <div class="modal-box" style="max-width:620px; width:100%; padding:1rem;">
+    <button class="modal-close-btn" onclick="closeAddModalDirect()">✕</button>
+    <div style="padding:1rem;">
+      <h2 style="font-family:Oswald,sans-serif;font-size:1.4rem;margin-bottom:0.75rem;color:var(--text-primary)">Add Player</h2>
+      <form id="add-form" onsubmit="handleAddPlayer(event)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Name</span><input class="filter-select" id="f-name" required></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Country</span><input class="filter-select" id="f-country" required></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Role</span><select class="filter-select" id="f-role" required><option value="Batsman">Batsman</option><option value="Bowler">Bowler</option><option value="All-rounder">All-rounder</option><option value="Wicket-keeper">Wicket-keeper</option></select></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">IPL Team</span><input class="filter-select" id="f-ipl" placeholder="MI, CSK, RCB..." /></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Age</span><input class="filter-select" id="f-age" type="number" min="15" max="50"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Emoji</span><input class="filter-select" id="f-emoji" placeholder="🏏"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Career Runs</span><input class="filter-select" id="f-runs" type="number"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Strike Rate</span><input class="filter-select" id="f-sr" type="number" step="0.1"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Average</span><input class="filter-select" id="f-avg" type="number" step="0.1"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">Wickets</span><input class="filter-select" id="f-wkts" type="number"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">100s</span><input class="filter-select" id="f-100s" type="number"></label>
+          <label><span style="display:block;font-size:0.72rem;margin-bottom:0.35rem;color:var(--text-muted)">IPL Runs</span><input class="filter-select" id="f-ipl-runs" type="number"></label>
+        </div>
+        <button class="gym-btn submit-btn" type="submit" style="margin-top:1rem; width:100%;">ADD PLAYER TO DATABASE</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ CART SIDEBAR ══════ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-header"><h3>🛒 YOUR CART</h3><button onclick="closeCart()" class="cart-close-btn">✕</button></div>
+  <div class="cart-items" id="cart-items-list"><div class="cart-empty">Your cart is empty</div></div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal-val">₹0</span></div>
+    <div class="cart-discount" id="cart-discount-row" style="display:none"><span>Discount</span><span id="cart-discount-val" style="color:var(--accent-green)">-₹0</span></div>
+    <div class="cart-total"><span>TOTAL</span><span id="cart-total-val">₹0</span></div>
+    <div class="cart-coupon-notice" id="cart-coupon-notice" style="display:none;color:var(--accent-green);font-size:0.85rem;margin:0.75rem 0;">Coupon applied</div>
+    <input type="text" class="coupon-input" id="coupon-input" placeholder="Coupon: IPL25, CRICKET10, FLAT500…">
+    <button class="apply-coupon-btn" onclick="applyCoupon()">APPLY COUPON</button>
+    <button class="checkout-btn" onclick="proceedCheckout()">PROCEED TO CHECKOUT →</button>
+  </div>
+</div>
+
+<!-- ══════ CHECKOUT MODAL ══════ -->
+<div class="modal-backdrop" id="checkout-modal" onclick="closeCheckoutModal(event)">
+  <div class="modal-box" style="max-width:580px">
+    <button class="modal-close-btn" onclick="closeCheckoutModalDirect()">✕</button>
+    <div id="checkout-inner"></div>
+  </div>
+</div>
+
+<!-- ══════ BUY/NOW MODAL ══════ -->
+<div class="modal-backdrop" id="buyNow-modal" onclick="closeBuyNowModal(event)">
+  <div class="modal-box" style="max-width:760px">
+    <button class="modal-close-btn" onclick="closePayModal()">✕</button>
+    <div id="buyNow-modal-inner"></div>
+  </div>
+</div>
+
+<!-- ══════ TOAST NOTIFICATION ══════ -->
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/portal.js"></script>
+<!-- ════════════════════════════════════════════════════════════════
+     PAYMENT INTERCEPTOR — replaces portal.js built-in payment step
+     with fully working Card / UPI / Net Banking flows
+     ════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── CSS ── */
+var css = `
+#pay-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9000;backdrop-filter:blur(10px)}
+#pay-modal-box{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9001;background:#0a1628;border:1.5px solid rgba(240,165,0,0.35);border-radius:20px;max-width:500px;width:95%;max-height:92vh;overflow-y:auto;box-shadow:0 32px 100px rgba(0,0,0,0.9);font-family:'Barlow',sans-serif;scrollbar-width:thin}
+.pm-hdr{background:linear-gradient(135deg,#060f1f,#0f2244);padding:1.2rem 1.5rem 0.9rem;border-bottom:1px solid rgba(240,165,0,0.18);position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;justify-content:space-between}
+.pm-hdr-left .pm-ttl{font-family:'Oswald',sans-serif;font-size:1.05rem;font-weight:700;color:#f0a500;letter-spacing:2px}
+.pm-hdr-left .pm-sub{font-size:0.65rem;color:#64748b;letter-spacing:1.5px;margin-top:1px}
+.pm-amt{background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.3);border-radius:7px;padding:4px 12px;font-family:'Oswald',sans-serif;font-size:1.15rem;font-weight:700;color:#f0a500;margin-top:6px;display:inline-block}
+.pm-x{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#8ba3c7;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:0.78rem;line-height:1;flex-shrink:0}
+.pm-x:hover{border-color:#f0a500;color:#f0a500}
+.pm-body{padding:1.2rem 1.5rem 1.5rem}
+/* method tabs */
+.pm-mtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1.2rem}
+.pm-mt{background:#060f1f;border:1.5px solid rgba(100,150,220,0.14);border-radius:10px;padding:9px 4px 7px;cursor:pointer;text-align:center;transition:all 0.18s;color:#64748b;font-size:0.65rem;font-weight:700;letter-spacing:0.5px;line-height:1.4}
+.pm-mt:hover{border-color:rgba(240,165,0,0.35);color:#f0a500;background:rgba(240,165,0,0.04)}
+.pm-mt.on{border-color:#f0a500;color:#f0a500;background:rgba(240,165,0,0.07)}
+.pm-mt-ico{font-size:1.3rem;display:block;margin-bottom:3px}
+/* step bar */
+.pm-sbar{display:flex;align-items:flex-start;margin-bottom:1.2rem}
+.pm-sdot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;flex-shrink:0;border:2px solid rgba(100,150,220,0.2);background:#060f1f;color:#64748b;transition:all 0.3s}
+.pm-sdot.act{border-color:#f0a500;color:#f0a500;background:rgba(240,165,0,0.1)}
+.pm-sdot.dn{border-color:#22c55e;background:#22c55e;color:#fff}
+.pm-sline{flex:1;height:2px;background:rgba(100,150,220,0.1);margin-top:11px;transition:background 0.3s}
+.pm-sline.dn{background:#22c55e}
+.pm-slbl{font-size:0.55rem;color:#64748b;text-align:center;margin-top:3px;letter-spacing:0.4px;width:24px}
+.pm-step-wrap{display:flex;flex-direction:column;align-items:center}
+/* fields */
+.pmf{margin-bottom:0.9rem}
+.pml{font-size:0.65rem;color:#8ba3c7;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;display:block}
+.pmi{width:100%;background:#060f1f;border:1.5px solid rgba(100,150,220,0.18);color:#f0f4ff;padding:9px 12px;border-radius:8px;font-size:0.86rem;outline:none;transition:border-color 0.18s;font-family:'Barlow',sans-serif;box-sizing:border-box}
+.pmi:focus{border-color:#f0a500}
+.pmr{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+/* card preview */
+.cv{background:linear-gradient(135deg,#1a3a6e,#0d1f3c);border-radius:13px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;position:relative;overflow:hidden}
+.cv::before{content:'';position:absolute;top:-25px;right:-25px;width:100px;height:100px;border-radius:50%;background:rgba(240,165,0,0.06)}
+.cv-chip{width:32px;height:22px;background:linear-gradient(135deg,#f0a500,#c87800);border-radius:4px;margin-bottom:10px}
+.cv-num{font-family:'Space Mono',monospace;font-size:0.88rem;color:rgba(255,255,255,0.88);letter-spacing:2.5px;margin-bottom:7px}
+.cv-bot{display:flex;justify-content:space-between;align-items:flex-end}
+.cv-lbl{font-size:0.5rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px}
+.cv-v{font-size:0.74rem;color:rgba(255,255,255,0.75);font-family:'Space Mono',monospace}
+/* otp */
+.otp-wrap{display:flex;gap:7px;justify-content:center;margin-bottom:0.9rem}
+.otp-d{width:42px;height:50px;background:#060f1f;border:2px solid rgba(100,150,220,0.2);border-radius:8px;color:#f0a500;font-family:'Space Mono',monospace;font-size:1.25rem;text-align:center;outline:none;transition:border-color 0.18s;font-size:1.2rem}
+.otp-d:focus{border-color:#f0a500}
+.otp-box{background:linear-gradient(135deg,#060f1f,#0a1628);border:1px solid rgba(240,165,0,0.2);border-radius:11px;padding:0.9rem 1rem;margin-bottom:1rem;text-align:center}
+.otp-tmr{font-family:'Space Mono',monospace;font-size:0.78rem;color:#64748b}
+.otp-tmr b{color:#f0a500}
+/* UPI */
+.upi-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1.1rem}
+.upi-t{background:#060f1f;border:1.5px solid rgba(100,150,220,0.14);border-radius:8px;padding:8px;cursor:pointer;text-align:center;color:#64748b;font-size:0.68rem;font-weight:700;transition:all 0.18s}
+.upi-t.on{border-color:#7c3aed;color:#a78bfa;background:rgba(124,58,237,0.07)}
+.qr-wrap{background:#fff;border-radius:12px;padding:11px;display:inline-block;position:relative;margin-bottom:0.8rem}
+.qr-sl{position:absolute;left:11px;right:11px;height:2px;background:linear-gradient(90deg,transparent,#22c55e,transparent);animation:qrScan 1.8s ease-in-out infinite;top:11px}
+@keyframes qrScan{0%{top:11px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 13px);opacity:0}}
+.upi-id-bar{background:#060f1f;border:1px solid rgba(240,165,0,0.2);border-radius:7px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
+.upi-id-v{font-family:'Space Mono',monospace;font-size:0.78rem;color:#f0a500}
+.upi-cp{background:none;border:none;color:#64748b;cursor:pointer;font-size:0.68rem;transition:color 0.18s}
+.upi-cp:hover{color:#f0a500}
+.apps-row{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:0.8rem}
+.app-tag{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:5px;padding:3px 8px;font-size:0.62rem;color:#8ba3c7}
+/* banks */
+.bank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1.1rem}
+.bnk{background:#060f1f;border:1.5px solid rgba(100,150,220,0.12);border-radius:9px;padding:9px 4px;text-align:center;cursor:pointer;transition:all 0.18s}
+.bnk:hover{border-color:rgba(240,165,0,0.35);background:rgba(240,165,0,0.03)}
+.bnk.on{border-color:#f0a500;background:rgba(240,165,0,0.07)}
+.bnk-ico{font-size:1.35rem;display:block;margin-bottom:3px}
+.bnk-nm{font-size:0.58rem;color:#8ba3c7;font-weight:700;letter-spacing:0.3px}
+.bnk.on .bnk-nm{color:#f0a500}
+/* redirect */
+.redir{text-align:center;padding:1.2rem 0.5rem}
+.spin{width:55px;height:55px;border:3px solid rgba(240,165,0,0.18);border-top-color:#f0a500;border-radius:50%;animation:spin 0.85s linear infinite;margin:0 auto 0.9rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* success */
+.pm-ok{text-align:center;padding:1.2rem 0.5rem}
+.ok-ico{width:65px;height:65px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 0.9rem;animation:popIn 0.55s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.ok-ref{background:#060f1f;border:1px solid rgba(240,165,0,0.22);border-radius:7px;padding:7px 12px;font-family:'Space Mono',monospace;font-size:0.78rem;color:#f0a500;margin:0.5rem auto;word-break:break-all;max-width:340px}
+/* buttons */
+.pm-btn{width:100%;padding:12px;background:linear-gradient(135deg,#f0a500,#c87800);border:none;color:#000;border-radius:9px;font-family:'Oswald',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:all 0.18s;margin-top:4px}
+.pm-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 25px rgba(240,165,0,0.3)}
+.pm-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.pm-btn2{width:100%;padding:9px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);color:#8ba3c7;border-radius:8px;font-size:0.78rem;cursor:pointer;margin-top:7px;transition:all 0.18s}
+.pm-btn2:hover{border-color:rgba(255,255,255,0.18);color:#f0f4ff}
+.pm-err{background:rgba(255,31,61,0.07);border:1px solid rgba(255,31,61,0.22);border-radius:7px;padding:7px 11px;font-size:0.72rem;color:#ff6b80;margin-bottom:0.85rem;display:none}
+.pm-info{font-size:0.68rem;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:0.9rem}
+/* inline payment step replacement */
+.ipm-wrap{padding:0}
+`;
+
+var styleEl = document.createElement('style');
+styleEl.textContent = css;
+document.head.appendChild(styleEl);
+
+/* ── Modal HTML ── */
+var overlay = document.createElement('div');
+overlay.id = 'pay-modal-overlay';
+overlay.onclick = function(e){ if(e.target===overlay) closePM(); };
+
+var box = document.createElement('div');
+box.id = 'pay-modal-box';
+box.innerHTML = '<div class="pm-hdr"><div class="pm-hdr-left"><div class="pm-ttl">💳 SECURE PAYMENT</div><div class="pm-sub">SSL ENCRYPTED · RBI COMPLIANT · BCCI LICENSED</div><div class="pm-amt" id="pm-amt-disp">₹0</div></div><button class="pm-x" onclick="closePM()">✕</button></div><div class="pm-body" id="pm-body"></div>';
+
+document.body.appendChild(overlay);
+document.body.appendChild(box);
+
+/* ── State ── */
+var PM = {
+  amount:0, label:'', onSuccess:null,
+  method:'card', upiTab:'qr',
+  bank:null,
+  cardStep:1, nbStep:1,
+  otpIv:null, otpSec:120,
+  card:{num:'',name:'',exp:'',cvv:''}
+};
+
+var UPI_VPA  = 'crickethub@upi';
+var UPI_NAME = 'Cricket Hub IPL';
+var BANKS = [
+  {id:'sbi',name:'SBI',ico:'🏛️'},{id:'hdfc',name:'HDFC',ico:'🔵'},
+  {id:'icici',name:'ICICI',ico:'🟠'},{id:'axis',name:'Axis',ico:'🟣'},
+  {id:'kotak',name:'Kotak',ico:'🔴'},{id:'pnb',name:'PNB',ico:'🟢'},
+  {id:'bob',name:'BoB',ico:'🏦'},{id:'yes',name:'Yes Bank',ico:'💚'},
+  {id:'other',name:'Other',ico:'🏧'}
+];
+
+/* ── Public open ── */
+window.openPaymentModal = function(amount, label, cb){
+  PM.amount = amount||0; PM.label = label||'IPL Purchase'; PM.onSuccess = cb||null;
+  PM.method='card'; PM.cardStep=1; PM.nbStep=1; PM.bank=null;
+  PM.card={num:'',name:'',exp:'',cvv:''};
+  clearInterval(PM.otpIv);
+  document.getElementById('pm-amt-disp').textContent = '₹'+fmt(PM.amount);
+  overlay.style.display = 'block';
+  box.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  render();
+};
+
+window.closePM = function(){
+  overlay.style.display='none'; box.style.display='none';
+  document.body.style.overflow='';
+  clearInterval(PM.otpIv);
+};
+
+function fmt(n){ return Number(n).toLocaleString('en-IN'); }
+function ref(prefix){ return prefix+'-'+Date.now().toString(36).toUpperCase(); }
+
+/* ── Render dispatcher ── */
+function render(){
+  if(PM.method==='card') renderCard();
+  else if(PM.method==='upi') renderUPI();
+  else renderNB();
+}
+
+function mbar(){
+  return '<div class="pm-mtabs">'+
+    mb('card','💳','Credit / Debit Card')+
+    mb('upi','📲','UPI / GPay / PhonePe')+
+    mb('netbank','🏦','Net Banking')+
+  '</div>';
+}
+function mb(id,ico,lbl){
+  return '<button class="pm-mt'+(PM.method===id?' on':'')+'" onclick="window._pmMethod(\''+id+'\')"><span class="pm-mt-ico">'+ico+'</span>'+lbl+'</button>';
+}
+window._pmMethod = function(m){ PM.method=m; PM.cardStep=1; PM.nbStep=1; PM.bank=null; clearInterval(PM.otpIv); render(); };
+
+/* ═══════════ CARD ═══════════ */
+function renderCard(){
+  var s = PM.cardStep;
+  var labels=['Details','OTP','Done'];
+  var html = mbar() + sbar(labels, s);
+  if(s===1) html += cardS1();
+  else if(s===2) html += cardS2();
+  else html += cardOK();
+  document.getElementById('pm-body').innerHTML = html;
+  if(s===1) wireCard();
+  if(s===2){ wireOTP('co'); startTimer(); }
+}
+
+function cardS1(){
+  var n = PM.card.num||''; var name=PM.card.name||''; var exp=PM.card.exp||''; var cvv=PM.card.cvv||'';
+  var dn = (n+'················').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+  return '<div class="cv"><div class="cv-chip"></div>'+
+    '<div class="cv-num" id="cv-num">'+dn+'</div>'+
+    '<div class="cv-bot">'+
+      '<div><div class="cv-lbl">Card Holder</div><div class="cv-v" id="cv-name">'+(name.toUpperCase()||'CARD HOLDER')+'</div></div>'+
+      '<div><div class="cv-lbl">Expires</div><div class="cv-v" id="cv-exp">'+(exp||'MM/YY')+'</div></div>'+
+      '<div style="font-size:1.2rem">💳</div>'+
+    '</div></div>'+
+    '<div id="pm-err" class="pm-err"></div>'+
+    '<div class="pmf"><label class="pml">Card Number</label>'+
+      '<input class="pmi" id="ci-num" type="tel" maxlength="19" placeholder="1234 5678 9012 3456" value="'+n.replace(/(.{4})/g,'$1 ').trim()+'"></div>'+
+    '<div class="pmf"><label class="pml">Name on Card</label>'+
+      '<input class="pmi" id="ci-name" type="text" placeholder="As printed on card" value="'+name+'"></div>'+
+    '<div class="pmr">'+
+      '<div class="pmf"><label class="pml">Expiry Date</label>'+
+        '<input class="pmi" id="ci-exp" type="tel" maxlength="5" placeholder="MM/YY" value="'+exp+'"></div>'+
+      '<div class="pmf"><label class="pml">CVV</label>'+
+        '<input class="pmi" id="ci-cvv" type="password" maxlength="3" placeholder="•••" value="'+cvv+'"></div>'+
+    '</div>'+
+    '<div class="pm-info"><span>🔒</span><span>256-bit SSL encrypted. Card details are never stored.</span></div>'+
+    '<button class="pm-btn" onclick="window._cardNext()">PROCEED TO OTP VERIFICATION →</button>';
+}
+
+function wireCard(){
+  var ni=document.getElementById('ci-num');
+  var xi=document.getElementById('ci-name');
+  var ei=document.getElementById('ci-exp');
+  var vi=document.getElementById('ci-cvv');
+  if(ni) ni.addEventListener('input',function(){
+    var v=this.value.replace(/\D/g,'').slice(0,16);
+    this.value=v.replace(/(.{4})/g,'$1 ').trim();
+    PM.card.num=v;
+    var el=document.getElementById('cv-num');
+    if(el) el.textContent=(v+'················').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+  });
+  if(xi) xi.addEventListener('input',function(){
+    PM.card.name=this.value;
+    var el=document.getElementById('cv-name');
+    if(el) el.textContent=(this.value.toUpperCase()||'CARD HOLDER');
+  });
+  if(ei) ei.addEventListener('input',function(){
+    var v=this.value.replace(/\D/g,'').slice(0,4);
+    if(v.length>=2) v=v.slice(0,2)+'/'+v.slice(2);
+    this.value=v; PM.card.exp=v;
+    var el=document.getElementById('cv-exp');
+    if(el) el.textContent=v||'MM/YY';
+  });
+  if(vi) vi.addEventListener('input',function(){ PM.card.cvv=this.value.replace(/\D/g,'').slice(0,3); });
+}
+
+window._cardNext = function(){
+  PM.card.num  = (document.getElementById('ci-num')||{}).value||PM.card.num;
+  PM.card.name = (document.getElementById('ci-name')||{}).value||PM.card.name;
+  PM.card.exp  = (document.getElementById('ci-exp')||{}).value||PM.card.exp;
+  PM.card.cvv  = (document.getElementById('ci-cvv')||{}).value||PM.card.cvv;
+  var err='';
+  if(PM.card.num.replace(/\s/g,'').length<16) err='Please enter a valid 16-digit card number.';
+  else if(!PM.card.name.trim()) err='Please enter the name as printed on the card.';
+  else if(PM.card.exp.length<5) err='Please enter a valid expiry date (MM/YY).';
+  else if(PM.card.cvv.length<3) err='Please enter the 3-digit CVV from the back of your card.';
+  if(err){ var e=document.getElementById('pm-err'); if(e){e.textContent=err;e.style.display='block';} return; }
+  PM.cardStep=2; renderCard();
+};
+
+function cardS2(){
+  var last4=PM.card.num.replace(/\s/g,'').slice(-4)||'****';
+  return '<div class="otp-box">'+
+    '<div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Bank OTP Verification</div>'+
+    '<div style="font-size:0.82rem;color:#f0f4ff;margin-bottom:3px">Card ending <b style="color:#f0a500">••••'+last4+'</b></div>'+
+    '<div style="font-size:0.72rem;color:#8ba3c7">Amount: <b style="color:#f0a500">₹'+fmt(PM.amount)+'</b> &nbsp;·&nbsp; Payee: '+UPI_NAME+'</div>'+
+  '</div>'+
+  '<div style="text-align:center;margin-bottom:1rem">'+
+    '<div style="font-size:0.68rem;color:#8ba3c7;margin-bottom:0.7rem;text-transform:uppercase;letter-spacing:1px">Enter 6-digit OTP sent to your registered mobile</div>'+
+    otpInputs('co')+
+    '<div class="otp-tmr" style="margin-top:7px">Expires in <b id="tmr-val">2:00</b></div>'+
+  '</div>'+
+  '<div id="pm-err" class="pm-err"></div>'+
+  '<button class="pm-btn" onclick="window._cardOk()">✓ VERIFY & PAY ₹'+fmt(PM.amount)+'</button>'+
+  '<button class="pm-btn2" onclick="window._cardBack()">← Change Card Details</button>';
+}
+window._cardBack = function(){ PM.cardStep=1; renderCard(); };
+window._cardOk = function(){
+  if(!otpVal('co')){ showErr('Please enter all 6 OTP digits.'); return; }
+  clearInterval(PM.otpIv); PM.cardStep=3; renderCard();
+  setTimeout(function(){ closePM(); fireSuccess(); }, 2600);
+};
+
+function cardOK(){
+  var r=ref('CH-CD');
+  return '<div class="pm-ok">'+
+    '<div class="ok-ico">✓</div>'+
+    '<div style="font-family:\'Oswald\',sans-serif;font-size:1.2rem;font-weight:700;color:#22c55e;margin-bottom:4px">PAYMENT SUCCESSFUL!</div>'+
+    '<div style="font-size:0.78rem;color:#8ba3c7;margin-bottom:4px">₹'+fmt(PM.amount)+' paid via Card ••••'+PM.card.num.replace(/\s/g,'').slice(-4)+'</div>'+
+    '<div class="ok-ref">'+r+'</div>'+
+    '<div style="font-size:0.68rem;color:#64748b">Confirming your booking…</div>'+
+  '</div>';
+}
+
+/* ═══════════ UPI ═══════════ */
+function renderUPI(){
+  var html = mbar()+
+    '<div class="upi-tabs">'+
+      '<button class="upi-t'+(PM.upiTab==='qr'?' on':'')+'" onclick="window._upiTab(\'qr\')">📷 Scan QR Code</button>'+
+      '<button class="upi-t'+(PM.upiTab==='id'?' on':'')+'" onclick="window._upiTab(\'id\')">🔤 Enter UPI ID</button>'+
+    '</div>';
+  html += PM.upiTab==='qr' ? upiQR() : upiID();
+  document.getElementById('pm-body').innerHTML = html;
+  if(PM.upiTab==='qr') loadQR();
+}
+window._upiTab = function(t){ PM.upiTab=t; renderUPI(); };
+
+function upiQR(){
+  return '<div style="text-align:center">'+
+    '<div style="font-size:0.7rem;color:#8ba3c7;margin-bottom:0.8rem">Scan with any UPI app to pay <b style="color:#f0a500">₹'+fmt(PM.amount)+'</b></div>'+
+    '<div class="qr-wrap"><img id="pm-qr" src="" alt="UPI QR" style="width:190px;height:190px;display:block;border-radius:4px;opacity:0.2;filter:blur(4px);transition:all 0.4s"><div class="qr-sl" id="pm-sl" style="display:none"></div></div>'+
+    '<div class="apps-row">'+
+      '<span class="app-tag">📲 Google Pay</span>'+
+      '<span class="app-tag">💜 PhonePe</span>'+
+      '<span class="app-tag">🔵 Paytm</span>'+
+      '<span class="app-tag">🟠 BHIM</span>'+
+      '<span class="app-tag">🔴 Amazon Pay</span>'+
+    '</div>'+
+    '<div class="upi-id-bar"><span class="upi-id-v">'+UPI_VPA+'</span><button class="upi-cp" id="upi-cp-btn" onclick="window._cpUPI()">📋 Copy ID</button></div>'+
+    '<button class="pm-btn" onclick="window._upiDone()">✓ I\'VE PAID — CONFIRM BOOKING</button>'+
+    '<button class="pm-btn2" onclick="window._upiAppOpen()">📱 Open in UPI App</button>'+
+  '</div>';
+}
+
+function upiID(){
+  return '<div>'+
+    '<div style="font-size:0.7rem;color:#8ba3c7;margin-bottom:0.9rem">Pay <b style="color:#f0a500">₹'+fmt(PM.amount)+'</b> to UPI ID below</div>'+
+    '<div class="pmf"><label class="pml">Your UPI ID</label>'+
+      '<input class="pmi" id="upi-id-inp" type="text" placeholder="yourname@upi / 9876543210@paytm" style="font-family:\'Space Mono\',monospace"></div>'+
+    '<div style="font-size:0.66rem;color:#64748b;margin-bottom:0.8rem">e.g. 9876543210@paytm · name@oksbi · 9876543210@ybl</div>'+
+    '<div style="background:#060f1f;border:1px solid rgba(240,165,0,0.18);border-radius:9px;padding:9px 13px;margin-bottom:1rem">'+
+      '<div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Paying To</div>'+
+      '<div style="font-family:\'Space Mono\',monospace;font-size:0.8rem;color:#f0a500">'+UPI_VPA+'</div>'+
+      '<div style="font-size:0.68rem;color:#8ba3c7;margin-top:2px">'+UPI_NAME+'</div>'+
+    '</div>'+
+    '<div id="pm-err" class="pm-err"></div>'+
+    '<button class="pm-btn" onclick="window._upiIDPay()">SEND ₹'+fmt(PM.amount)+' →</button>'+
+  '</div>';
+}
+
+function buildUPILink(){
+  return 'upi://pay?pa='+UPI_VPA+'&pn='+encodeURIComponent(UPI_NAME)+'&tn='+encodeURIComponent('IPL-'+PM.label)+'&am='+PM.amount.toFixed(2)+'&cu=INR&tid=CH'+Date.now();
+}
+
+function loadQR(){
+  var img=document.getElementById('pm-qr'); var sl=document.getElementById('pm-sl');
+  if(!img) return;
+  var url='https://api.qrserver.com/v1/create-qr-code/?size=190x190&ecc=M&margin=0&data='+encodeURIComponent(buildUPILink());
+  var t=new Image();
+  t.onload=function(){ img.src=t.src; img.style.opacity='1'; img.style.filter='none'; if(sl) sl.style.display='block'; };
+  t.onerror=function(){ img.src='https://chart.googleapis.com/chart?chs=190x190&cht=qr&chl='+encodeURIComponent(buildUPILink()); img.style.opacity='1'; img.style.filter='none'; };
+  t.src=url;
+}
+
+window._cpUPI = function(){
+  if(navigator.clipboard) navigator.clipboard.writeText(UPI_VPA).catch(function(){});
+  var b=document.getElementById('upi-cp-btn'); if(b){b.textContent='✓ Copied!'; setTimeout(function(){b.textContent='📋 Copy ID';},2000);}
+};
+window._upiAppOpen = function(){ window.open(buildUPILink(),'_blank'); };
+window._upiDone = function(){
+  var r=ref('CH-UPI');
+  document.getElementById('pm-body').innerHTML = mbar()+
+    '<div class="pm-ok"><div class="ok-ico">✓</div>'+
+    '<div style="font-family:\'Oswald\',sans-serif;font-size:1.2rem;font-weight:700;color:#22c55e;margin-bottom:4px">PAYMENT CONFIRMED!</div>'+
+    '<div style="font-size:0.78rem;color:#8ba3c7;margin-bottom:4px">₹'+fmt(PM.amount)+' · UPI · '+UPI_VPA+'</div>'+
+    '<div class="ok-ref">'+r+'</div>'+
+    '<div style="font-size:0.68rem;color:#64748b">Confirming your booking…</div></div>';
+  setTimeout(function(){ closePM(); fireSuccess(); }, 2400);
+};
+window._upiIDPay = function(){
+  var v=(document.getElementById('upi-id-inp')||{}).value||'';
+  if(!v.includes('@')){ showErr('Enter a valid UPI ID (e.g. name@upi)'); return; }
+  var btn=document.querySelector('.pm-btn'); if(btn){btn.textContent='⏳ Processing…';btn.disabled=true;}
+  setTimeout(function(){ window._upiDone(); }, 1400);
+};
+
+/* ═══════════ NET BANKING ═══════════ */
+function renderNB(){
+  var labels=['Select Bank','Redirect','OTP','Confirmed'];
+  var html = mbar() + sbar(labels, PM.nbStep);
+  if(PM.nbStep===1) html+=nbS1();
+  else if(PM.nbStep===2) html+=nbS2();
+  else if(PM.nbStep===3) html+=nbS3();
+  else html+=nbOK();
+  document.getElementById('pm-body').innerHTML = html;
+  if(PM.nbStep===3){ wireOTP('nb'); startTimer(); }
+}
+
+function nbS1(){
+  var grid='<div class="bank-grid">';
+  BANKS.forEach(function(b){
+    grid+='<div class="bnk'+(PM.bank&&PM.bank.id===b.id?' on':'')+'" id="bnk-'+b.id+'" onclick="window._selBank(\''+b.id+'\')">'+
+      '<span class="bnk-ico">'+b.ico+'</span><div class="bnk-nm">'+b.name+'</div></div>';
+  });
+  grid+='</div>';
+  var dis=PM.bank?'':'disabled';
+  return '<div style="font-size:0.72rem;color:#8ba3c7;margin-bottom:0.9rem">Select your bank to continue</div>'+
+    grid+
+    '<div id="pm-err" class="pm-err"></div>'+
+    '<button class="pm-btn" id="nb-cont" '+dis+' onclick="window._nbGo()">CONTINUE TO '+(PM.bank?PM.bank.name.toUpperCase():'BANK')+' PORTAL →</button>';
+}
+window._selBank = function(id){
+  PM.bank=BANKS.find(function(b){return b.id===id;})||null;
+  document.querySelectorAll('.bnk').forEach(function(el){el.classList.remove('on');});
+  var el=document.getElementById('bnk-'+id); if(el) el.classList.add('on');
+  var btn=document.getElementById('nb-cont');
+  if(btn){btn.disabled=false;btn.textContent='CONTINUE TO '+(PM.bank?PM.bank.name.toUpperCase():'')+' PORTAL →';}
+};
+window._nbGo = function(){
+  if(!PM.bank) return;
+  PM.nbStep=2; renderNB();
+  setTimeout(function(){PM.nbStep=3;renderNB();},2100);
+};
+
+function nbS2(){
+  var nm=PM.bank?PM.bank.name:'Bank';
+  return '<div class="redir">'+
+    '<div class="spin"></div>'+
+    '<div style="font-family:\'Oswald\',sans-serif;font-size:1.05rem;color:#f0a500;margin-bottom:5px;letter-spacing:1px">REDIRECTING…</div>'+
+    '<div style="font-size:0.8rem;color:#8ba3c7">Connecting to <b style="color:#f0f4ff">'+nm+' Net Banking Portal</b></div>'+
+    '<div style="font-size:0.66rem;color:#64748b;margin-top:6px">Establishing secure 256-bit SSL connection…</div>'+
+    '<div style="height:3px;background:#060f1f;border-radius:2px;margin-top:1rem;overflow:hidden">'+
+      '<div style="height:100%;width:0;background:linear-gradient(90deg,#f0a500,#22c55e);border-radius:2px;animation:nbprog 2s ease-out forwards"></div>'+
+    '</div></div>'+
+    '<style>@keyframes nbprog{0%{width:0}70%{width:82%}100%{width:94%}}</style>';
+}
+
+function nbS3(){
+  var nm=PM.bank?PM.bank.name:'Bank';
+  return '<div class="otp-box">'+
+    '<div style="font-size:0.62rem;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">'+nm+' Secure Authorization</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'+
+      '<span style="font-size:0.68rem;color:#8ba3c7">Amount</span>'+
+      '<span style="font-family:\'Oswald\',sans-serif;font-size:0.95rem;font-weight:700;color:#f0a500">₹'+fmt(PM.amount)+'</span>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-size:0.68rem;color:#8ba3c7">Payee</span>'+
+      '<span style="font-size:0.74rem;color:#f0f4ff">'+UPI_NAME+'</span>'+
+    '</div>'+
+  '</div>'+
+  '<div style="text-align:center;margin-bottom:1rem">'+
+    '<div style="font-size:0.68rem;color:#8ba3c7;margin-bottom:0.7rem;text-transform:uppercase;letter-spacing:1px">Enter 6-digit OTP sent to your registered mobile</div>'+
+    otpInputs('nb')+
+    '<div class="otp-tmr" style="margin-top:7px">Expires in <b id="tmr-val">2:00</b></div>'+
+  '</div>'+
+  '<div id="pm-err" class="pm-err"></div>'+
+  '<button class="pm-btn" onclick="window._nbOk()">✓ AUTHORIZE PAYMENT</button>'+
+  '<button class="pm-btn2" onclick="window._nbResend()">↻ Resend OTP</button>';
+}
+window._nbOk = function(){
+  if(!otpVal('nb')){ showErr('Please enter all 6 OTP digits.'); return; }
+  clearInterval(PM.otpIv); PM.nbStep=4; renderNB();
+  setTimeout(function(){ closePM(); fireSuccess(); }, 2600);
+};
+window._nbResend = function(){
+  PM.otpSec=120; startTimer();
+  for(var i=0;i<6;i++){var e=document.getElementById('nb-'+i);if(e)e.value='';}
+  var f=document.getElementById('nb-0');if(f)f.focus();
+  var er=document.getElementById('pm-err');if(er)er.style.display='none';
+};
+
+function nbOK(){
+  var nm=PM.bank?PM.bank.name:'Bank'; var r=ref('CH-NB');
+  return '<div class="pm-ok">'+
+    '<div class="ok-ico">✓</div>'+
+    '<div style="font-family:\'Oswald\',sans-serif;font-size:1.2rem;font-weight:700;color:#22c55e;margin-bottom:4px">PAYMENT AUTHORIZED!</div>'+
+    '<div style="font-size:0.78rem;color:#8ba3c7;margin-bottom:4px">₹'+fmt(PM.amount)+' via '+nm+' Net Banking</div>'+
+    '<div class="ok-ref">'+r+'</div>'+
+    '<div style="font-size:0.68rem;color:#64748b">Confirming your booking…</div></div>';
+}
+
+/* ═══════════ HELPERS ═══════════ */
+function sbar(labels, cur){
+  var h='<div class="pm-sbar">';
+  for(var i=0;i<labels.length;i++){
+    var cls=i+1<cur?'pm-sdot dn':i+1===cur?'pm-sdot act':'pm-sdot';
+    var txt=i+1<cur?'✓':(i+1).toString();
+    h+='<div class="pm-step-wrap"><div class="'+cls+'">'+txt+'</div><div class="pm-slbl">'+labels[i]+'</div></div>';
+    if(i<labels.length-1) h+='<div class="pm-sline'+(i+1<cur?' dn':'')+'"></div>';
+  }
+  return h+'</div>';
+}
+
+function otpInputs(pfx){
+  var h='<div class="otp-wrap">';
+  for(var i=0;i<6;i++) h+='<input class="otp-d" id="'+pfx+'-'+i+'" type="tel" maxlength="1" inputmode="numeric">';
+  return h+'</div>';
+}
+
+function wireOTP(pfx){
+  for(var i=0;i<6;i++){
+    (function(idx){
+      var el=document.getElementById(pfx+'-'+idx); if(!el)return;
+      el.addEventListener('input',function(){
+        this.value=this.value.replace(/\D/g,'').slice(0,1);
+        if(this.value&&idx<5){ var nx=document.getElementById(pfx+'-'+(idx+1)); if(nx)nx.focus(); }
+      });
+      el.addEventListener('keydown',function(e){
+        if(e.key==='Backspace'&&!this.value&&idx>0){ var pv=document.getElementById(pfx+'-'+(idx-1)); if(pv){pv.value='';pv.focus();} }
+      });
+    })(i);
+  }
+  var f=document.getElementById(pfx+'-0'); if(f)f.focus();
+}
+
+function otpVal(pfx){
+  var v=''; for(var i=0;i<6;i++){var e=document.getElementById(pfx+'-'+i);v+=(e?e.value:'');}
+  return v.length===6?v:null;
+}
+
+function startTimer(){
+  PM.otpSec=120; clearInterval(PM.otpIv);
+  PM.otpIv=setInterval(function(){
+    PM.otpSec--;
+    var el=document.getElementById('tmr-val');
+    if(el){
+      var m=Math.floor(PM.otpSec/60),s=PM.otpSec%60;
+      el.textContent=m+':'+(s<10?'0':'')+s;
+      if(PM.otpSec<=30)el.style.color='#ff1f3d';
+    }
+    if(PM.otpSec<=0)clearInterval(PM.otpIv);
+  },1000);
+}
+
+function showErr(msg){
+  var e=document.getElementById('pm-err'); if(e){e.textContent=msg;e.style.display='block';}
+}
+
+function fireSuccess(){
+  if(typeof PM.onSuccess==='function') try{PM.onSuccess();}catch(ex){}
+}
+
+/* ═══════════════════════════════════════════════════════
+   DOM INTERCEPTOR — watches for portal.js payment UI
+   and replaces it with our modal
+   ═══════════════════════════════════════════════════════ */
+var _intercepting = false;
+
+window.__disablePaymentInterceptor = true;
+function interceptPaymentUI(root){
+  if(window.__disablePaymentInterceptor) return;
+  if(!root) return;
+}
+
+document.addEventListener('DOMContentLoaded',function(){});
+})();
+</script>
+</body>
+</html>

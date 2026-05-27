@@ -77,31 +77,59 @@ function pushAppHistory(state, replace = false) {
   }
 }
 
+// expose helper for other scripts
+window.appPushHistory = pushAppHistory;
+window.appGetCurrentSectionName = getCurrentSectionName;
+
 function handleAppPopState(event) {
   const state = event.state || { page: 'section', section: getDefaultSectionName() };
   const sectionName = state.section || getDefaultSectionName();
   const sectionBtn = document.querySelector(`[data-section="${sectionName}"]`);
 
+  // Cart state
   if (state.page === 'cart') {
+    // Close other modals
     if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
     if (typeof window.closePayModal === 'function') window.closePayModal(true);
+    // Open cart UI
     if (typeof window.openCart === 'function') window.openCart(true);
+    // keep section in view
     if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
     return;
   }
 
-  if (state.page === 'checkout') {
+  // Payment state (user navigated to payment)
+  if (state.page === 'payment') {
     if (typeof window.closeCart === 'function') window.closeCart(true);
     if (typeof window.closePayModal === 'function') window.closePayModal(true);
     if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
-    if (typeof window.openCheckoutModalFromHistory === 'function') {
-      window.openCheckoutModalFromHistory(true);
-    } else if (typeof window.openCheckoutPayment === 'function') {
-      window.openCheckoutPayment(true);
-    }
+    // Open payment modal (skip pushing a new history entry)
+    if (typeof window.openCheckoutPayment === 'function') window.openCheckoutPayment(true);
+    else if (typeof window.openTicketPayment === 'function') window.openTicketPayment(true);
     return;
   }
 
+  // Order confirmation page
+  if (state.page === 'order-confirm') {
+    // ensure payment modal closed
+    if (typeof window.closeCart === 'function') window.closeCart(true);
+    if (typeof window.closePayModal === 'function') window.closePayModal(true);
+    if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
+    // Show checkout modal with order confirmed content
+    if (typeof window.openCheckoutModalFromHistory === 'function') window.openCheckoutModalFromHistory(true);
+    return;
+  }
+
+  // Order success - final state, close modals and show section
+  if (state.page === 'order-success') {
+    if (typeof window.closeCart === 'function') window.closeCart(true);
+    if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
+    if (typeof window.closePayModal === 'function') window.closePayModal(true);
+    if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
+    return;
+  }
+
+  // buyNow / other flows (fallback to earlier behavior)
   if (state.page === 'buyNow') {
     if (typeof window.closeCart === 'function') window.closeCart(true);
     if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
@@ -114,11 +142,13 @@ function handleAppPopState(event) {
     return;
   }
 
+  // Default: restore section and close any open overlay/modals
   if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
   if (typeof window.closeCart === 'function') window.closeCart(true);
   if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
   if (typeof window.closePayModal === 'function') window.closePayModal(true);
 }
+ 
 
 // Logout
 function doLogout() {

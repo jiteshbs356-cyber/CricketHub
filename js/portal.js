@@ -276,9 +276,7 @@ function applyCoupon(){
 
 function openCart(fromPop=false){
   if (!fromPop && window.history.state?.page !== 'cart') {
-    if (typeof window.appPushHistory === 'function') {
-      window.appPushHistory({ page: 'cart', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
-    }
+    try { history.pushState({ page: 'cart' }, '', '#cart'); } catch(e){}
   }
   document.getElementById('cart-sidebar')?.classList.add('open');
   document.getElementById('cart-overlay')?.classList.add('open');
@@ -657,21 +655,24 @@ window.openCheckoutPayment = (skipHistory=false)=>{
   const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
   const discount = getCouponDiscount(subtotal);
   const total = subtotal - discount;
-  if (!skipHistory && window.history.state?.page !== 'checkout') {
-    if (typeof window.appPushHistory === 'function') {
-      window.appPushHistory({ page: 'checkout', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
-    }
+  if (!skipHistory && window.history.state?.page !== 'payment') {
+    try { history.pushState({ page: 'payment' }, '', '#payment'); } catch(e){}
   }
   if(typeof window.openPaymentModal==='function'){
     openPaymentModal(total,'IPL Purchase',()=>{
+      // push order-confirm then render confirmation and replace to order-success
+      try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
       checkoutStep=3;
       renderCheckoutModal();
+      try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
       document.getElementById('checkout-modal').classList.add('open');
       document.body.style.overflow='hidden';
     });
   } else {
+    try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
     checkoutStep=3;
     renderCheckoutModal();
+    try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
     document.getElementById('checkout-modal').classList.add('open');
     document.body.style.overflow='hidden';
   }
@@ -686,12 +687,16 @@ window.openTicketPayment = ()=>{
   const grand = total + gst;
   if(typeof window.openPaymentModal==='function'){
     openPaymentModal(grand,'IPL Ticket Booking',()=>{
+      try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
       ticketState.step=5;
       renderTicketModal();
+      try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
     });
   } else {
+    try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
     ticketState.step=5;
     renderTicketModal();
+    try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
   }
 };
 window.selectPM=(el)=>{document.querySelectorAll('.pm-option').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');};

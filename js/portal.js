@@ -274,14 +274,45 @@ function applyCoupon(){
   }
 }
 
-function openCart(){
+function openCart(fromPop=false){
+  if (!fromPop && window.history.state?.page !== 'cart') {
+    if (typeof window.appPushHistory === 'function') {
+      window.appPushHistory({ page: 'cart', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
+    }
+  }
   document.getElementById('cart-sidebar')?.classList.add('open');
   document.getElementById('cart-overlay')?.classList.add('open');
   renderCartItems();
 }
-function closeCart(){
+function closeCart(fromPop=false){
+  if (!fromPop && window.history.state?.page === 'cart') {
+    window.history.back();
+    return;
+  }
   document.getElementById('cart-sidebar')?.classList.remove('open');
   document.getElementById('cart-overlay')?.classList.remove('open');
+}
+
+function openCheckoutModalFromHistory(fromPop=false) {
+  if (!fromPop && window.history.state?.page !== 'checkout') {
+    if (typeof window.appPushHistory === 'function') {
+      window.appPushHistory({ page: 'checkout', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
+    }
+  }
+  checkoutStep = Math.max(1, checkoutStep);
+  renderCheckoutModal();
+  document.getElementById('checkout-modal')?.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function openBuyNowModalFromHistory(flow, fromPop=false) {
+  if (!fromPop && window.history.state?.page !== 'buyNow') {
+    if (typeof window.appPushHistory === 'function') {
+      window.appPushHistory({ page: 'buyNow', flow: flow || 'ticket', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
+    }
+  }
+  document.getElementById('buyNow-modal')?.classList.add('open');
+  document.body.style.overflow='hidden';
 }
 
 function setBuyNowModalContent(html) {
@@ -300,6 +331,9 @@ function openAddJersey(jid){
   if(!j||!j.inStock)return;
   sizePick={jid,size:j.sizes[0],qty:1};
   renderSizePicker();
+  if (typeof window.appPushHistory === 'function') {
+    window.appPushHistory({ page: 'buyNow', flow: 'add', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
+  }
   document.getElementById('buyNow-modal').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -619,10 +653,15 @@ window.openBuyNowPayment = ()=>{
     renderBuyNow();
   }
 };
-window.openCheckoutPayment = ()=>{
+window.openCheckoutPayment = (skipHistory=false)=>{
   const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
   const discount = getCouponDiscount(subtotal);
   const total = subtotal - discount;
+  if (!skipHistory && window.history.state?.page !== 'checkout') {
+    if (typeof window.appPushHistory === 'function') {
+      window.appPushHistory({ page: 'checkout', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
+    }
+  }
   if(typeof window.openPaymentModal==='function'){
     openPaymentModal(total,'IPL Purchase',()=>{
       checkoutStep=3;
@@ -986,6 +1025,9 @@ function openTicketBooking(matchId){
   if(!m)return;
   ticketState={matchId,stand:m.prices[0].stand,qty:1,step:1,zone:null,block:null,selectedSeats:[],seats:null,seatStep:1};
   renderTicketModal();
+  if (typeof window.appPushHistory === 'function') {
+    window.appPushHistory({ page: 'buyNow', flow: 'ticket', section: window.appGetCurrentSectionName ? window.appGetCurrentSectionName() : 'portal' });
+  }
   document.getElementById('buyNow-modal').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -1333,7 +1375,15 @@ window.goCheckoutStep=(s)=>{
   renderCheckoutModal();
 };
 function closeCheckoutModal(e){if(e.target===document.getElementById('checkout-modal'))closeCheckoutModalDirect();}
-function closeCheckoutModalDirect(){document.getElementById('checkout-modal')?.classList.remove('open');document.body.style.overflow='';checkoutStep=1;}
+function closeCheckoutModalDirect(fromPop=false){
+  if (!fromPop && window.history.state?.page === 'checkout') {
+    window.history.back();
+    return;
+  }
+  document.getElementById('checkout-modal')?.classList.remove('open');
+  document.body.style.overflow='';
+  checkoutStep=1;
+}
 
 // ================================================================
 // VALIDATION FUNCTIONS
@@ -1561,7 +1611,11 @@ function clearFieldError(fieldId) {
   if (existingError) existingError.remove();
 }
 
-function closePayModal() {
+function closePayModal(fromPop=false) {
+  if (!fromPop && window.history.state?.page === 'buyNow') {
+    window.history.back();
+    return;
+  }
   document.getElementById('buyNow-modal')?.classList.remove('open');
   document.body.style.overflow = '';
 }

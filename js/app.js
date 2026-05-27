@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-center .nav-tab').forEach(btn => {
     btn.addEventListener('click', closePopupMenu);
   });
+
+  // Set initial page state for native back navigation
+  const initialSection = getCurrentSectionName() || getDefaultSectionName();
+  if (initialSection) {
+    history.replaceState({ page: 'section', section: initialSection }, '', window.location.pathname + window.location.search + window.location.hash);
+  }
+  window.addEventListener('popstate', handleAppPopState);
 });
 
 // Show logged-in user in navbar pill
@@ -48,6 +55,71 @@ function checkUserSession() {
   }
 }
 
+function getCurrentSectionName() {
+  const active = document.querySelector('.section.active');
+  if (!active) return null;
+  return active.id?.replace(/^sec-/, '') || null;
+}
+
+function getDefaultSectionName() {
+  if (document.getElementById('sec-portal')) return 'portal';
+  if (document.getElementById('sec-home')) return 'home';
+  return null;
+}
+
+function pushAppHistory(state, replace = false) {
+  if (!state || typeof state !== 'object') return;
+  const url = window.location.pathname + window.location.search + window.location.hash;
+  if (replace) {
+    history.replaceState(state, '', url);
+  } else {
+    history.pushState(state, '', url);
+  }
+}
+
+function handleAppPopState(event) {
+  const state = event.state || { page: 'section', section: getDefaultSectionName() };
+  const sectionName = state.section || getDefaultSectionName();
+  const sectionBtn = document.querySelector(`[data-section="${sectionName}"]`);
+
+  if (state.page === 'cart') {
+    if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
+    if (typeof window.closePayModal === 'function') window.closePayModal(true);
+    if (typeof window.openCart === 'function') window.openCart(true);
+    if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
+    return;
+  }
+
+  if (state.page === 'checkout') {
+    if (typeof window.closeCart === 'function') window.closeCart(true);
+    if (typeof window.closePayModal === 'function') window.closePayModal(true);
+    if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
+    if (typeof window.openCheckoutModalFromHistory === 'function') {
+      window.openCheckoutModalFromHistory(true);
+    } else if (typeof window.openCheckoutPayment === 'function') {
+      window.openCheckoutPayment(true);
+    }
+    return;
+  }
+
+  if (state.page === 'buyNow') {
+    if (typeof window.closeCart === 'function') window.closeCart(true);
+    if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
+    if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
+    if (typeof window.openBuyNowModalFromHistory === 'function') {
+      window.openBuyNowModalFromHistory(state.flow || 'ticket', true);
+    } else if (typeof window.openBuyNowModal === 'function') {
+      window.openBuyNowModal(true);
+    }
+    return;
+  }
+
+  if (sectionName) switchSection(sectionName, sectionBtn, { skipHistory: true });
+  if (typeof window.closeCart === 'function') window.closeCart(true);
+  if (typeof window.closeCheckoutModalDirect === 'function') window.closeCheckoutModalDirect(true);
+  if (typeof window.closePayModal === 'function') window.closePayModal(true);
+}
+
 // Logout
 function doLogout() {
   sessionStorage.removeItem('ipl_current_user');
@@ -58,7 +130,10 @@ function doLogout() {
 // ============================================================
 // NAVIGATION
 // ============================================================
-function switchSection(name, btn) {
+function switchSection(name, btn, options = {}) {
+  if (!options.skipHistory) {
+    pushAppHistory({ page: 'section', section: name });
+  }
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + name)?.classList.add('active');

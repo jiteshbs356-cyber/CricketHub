@@ -568,8 +568,8 @@ function renderBuyNow(){
         ${(()=>{const _d=buildOrderQRData(orderId,{item:item.name,date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),size:size||item.cat||'—',qty,unitPrice:'₹'+item.price.toLocaleString(),delivery:delivery===0?'FREE':'₹'+delivery,total:'₹'+grand.toLocaleString(),isJersey:type==='jersey'});return qrBlock(orderId,type==='jersey'?'jersey_order':'merch_order',_d.text,_d.userName);})()}
         <p style="font-size:0.78rem;color:var(--text-muted)">📧 Confirmation sent to your email · 🚚 Delivery in 3–5 business days · Show QR for delivery verification</p>
         <div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:center;flex-wrap:wrap">
-          <button class="tbm-add-cart-btn" style="max-width:160px;background:var(--bg-card3);color:var(--text-secondary)" onclick="closePayModal()">CLOSE</button>
-          <button class="tbm-add-cart-btn" style="max-width:200px" onclick="closePayModal();switchSection('myaccount',null)">👤 MY ACCOUNT →</button>
+          <button class="tbm-add-cart-btn" style="max-width:160px;background:var(--bg-card3);color:var(--text-secondary)" onclick="resetHistoryAfterOrderSuccess('portal')">CLOSE</button>
+          <button class="tbm-add-cart-btn" style="max-width:200px" onclick="resetHistoryAfterOrderSuccess('myaccount');switchSection('myaccount',null)">👤 MY ACCOUNT →</button>
         </div>
       </div>`;
   }
@@ -660,16 +660,16 @@ window.openCheckoutPayment = (skipHistory=false)=>{
   }
   if(typeof window.openPaymentModal==='function'){
     openPaymentModal(total,'IPL Purchase',()=>{
-      // push order-confirm then render confirmation and replace to order-success
-      try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
+      // Close payment modal and show order confirmation
+      if (typeof window.closePM === 'function') window.closePM();
       checkoutStep=3;
       renderCheckoutModal();
+      // Replace history with order-success, clearing cart/payment from stack
       try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
       document.getElementById('checkout-modal').classList.add('open');
       document.body.style.overflow='hidden';
     });
   } else {
-    try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
     checkoutStep=3;
     renderCheckoutModal();
     try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
@@ -687,13 +687,14 @@ window.openTicketPayment = ()=>{
   const grand = total + gst;
   if(typeof window.openPaymentModal==='function'){
     openPaymentModal(grand,'IPL Ticket Booking',()=>{
-      try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
+      // Close payment modal, show confirmation, and reset history
+      if (typeof window.closePM === 'function') window.closePM();
       ticketState.step=5;
       renderTicketModal();
+      // Replace history to remove ticket selection and payment states from stack
       try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
     });
   } else {
-    try { history.pushState({ page: 'order-confirm' }, '', '#order-confirm'); } catch(e){}
     ticketState.step=5;
     renderTicketModal();
     try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
@@ -1165,8 +1166,8 @@ function renderTicketModal(){
         ${(()=>{const _d=buildTicketQRData(bookingId,{match:`${m.team1} vs ${m.team2}`,date:m.date,time:m.time,venue:m.venue,stand,block:ticketState.block||'—',seats:seatList,tickets:qty,unitPrice:'₹'+(selPrice?.price||0).toLocaleString(),total:'₹'+grand.toLocaleString(),bookedOn:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})});return qrBlock(bookingId,'match_ticket',_d.text,_d.userName);})()}
         <p style="font-size:0.78rem;color:var(--text-muted)">📧 E-tickets sent to email · 📱 Show QR code at stadium gate · 🆔 Carry valid govt ID proof</p>
         <div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:center;flex-wrap:wrap">
-          <button class="tbm-add-cart-btn" style="max-width:160px;background:var(--bg-card3);color:var(--text-secondary)" onclick="closePayModal()">CLOSE</button>
-          <button class="tbm-add-cart-btn" style="max-width:200px" onclick="closePayModal();switchSection('myaccount',null)">👤 MY ACCOUNT →</button>
+          <button class="tbm-add-cart-btn" style="max-width:160px;background:var(--bg-card3);color:var(--text-secondary)" onclick="resetHistoryAfterOrderSuccess('tickets')">CLOSE</button>
+          <button class="tbm-add-cart-btn" style="max-width:200px" onclick="resetHistoryAfterOrderSuccess('myaccount');switchSection('myaccount',null)">👤 MY ACCOUNT →</button>
         </div>
       </div>`;
   }
@@ -1243,6 +1244,24 @@ window.hideSeatTip = () => {
 // CART → CHECKOUT MODAL
 // ================================================================
 let checkoutStep=1;
+// Helper: Reset navigation history after order success
+function resetHistoryAfterOrderSuccess(targetSection='portal') {
+  // Close all modals
+  document.getElementById('checkout-modal')?.classList.remove('open');
+  document.getElementById('buyNow-modal')?.classList.remove('open');
+  if (typeof window.closePM === 'function') window.closePM();
+  document.body.style.overflow='';
+  
+  // Reset checkout state
+  checkoutStep = 1;
+  
+  // Replace history to current section (removes cart, payment, order states)
+  const sectionName = getCurrentSectionName?.() || targetSection;
+  try {
+    history.replaceState({ page: 'section', section: sectionName }, '', window.location.pathname + window.location.search + window.location.hash);
+  } catch(e){}
+}
+
 function proceedCheckout(){
   if(!cart.length){showToast('Your cart is empty!','error');return;}
   closeCart();
@@ -1318,8 +1337,8 @@ function renderCheckoutModal(){
         ${(()=>{const _d=buildCartQRData(orderId,cart.slice(),{date:orderDate,subtotal:'₹'+subtotal.toLocaleString(),discount:discount>0?'₹'+discount.toLocaleString():'',total:'₹'+subtotalPaid.toLocaleString()});return qrBlock(orderId,'cart_order',_d.text,_d.userName);})()}
         <p style="font-size:0.78rem;color:var(--text-muted)">📧 Confirmation sent to your email · 🚚 Show QR for delivery verification</p>
         <div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:center;flex-wrap:wrap">
-          <button class="checkout-btn" style="max-width:200px;background:var(--bg-card3);color:var(--text-secondary)" onclick="closeCheckoutModalDirect();switchSection('myaccount',null)">👤 MY ACCOUNT</button>
-          <button class="checkout-btn" style="max-width:220px" onclick="closeCheckoutModalDirect();switchSection('portal',document.querySelector('[data-section=portal]'))">🏠 CONTINUE SHOPPING →</button>
+          <button class="checkout-btn" style="max-width:200px;background:var(--bg-card3);color:var(--text-secondary)" onclick="resetHistoryAfterOrderSuccess('myaccount');switchSection('myaccount',null)">👤 MY ACCOUNT</button>
+          <button class="checkout-btn" style="max-width:220px" onclick="resetHistoryAfterOrderSuccess('portal');switchSection('portal',document.querySelector('[data-section=portal]'))">🏠 CONTINUE SHOPPING →</button>
         </div>
       </div>`;
   }

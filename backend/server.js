@@ -20,14 +20,12 @@ const API_BASE = 'https://api.cricapi.com/v1';
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Serve static frontend files with NO cache for images
+// Serve static frontend files with NO cache during development so updated JS/CSS always load
 app.use(express.static(path.join(__dirname, '..'), {
   setHeaders: (res, filePath) => {
-    if (/\.(jpg|jpeg|png|gif|webp)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    }
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
   }
 }));
 

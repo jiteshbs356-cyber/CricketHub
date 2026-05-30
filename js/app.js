@@ -154,6 +154,7 @@ function handleAppPopState(event) {
 function doLogout() {
   sessionStorage.removeItem('ipl_current_user');
   localStorage.removeItem('ipl_current_user_remember');
+  if (typeof loadCart === 'function') loadCart();
   window.location.replace('auth.html');
 }
 

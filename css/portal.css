@@ -534,6 +534,20 @@
 }
 .checkout-btn:hover { background: #e09400; transform: translateY(-1px); }
 
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 3000;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
 /* ===== CHECKOUT MODAL ===== */
 .checkout-steps { display: flex; gap: 0; margin-bottom: 1.5rem; }
 .cs-step {

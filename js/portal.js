@@ -175,7 +175,35 @@ function showToast(msg, type='info') {
 // CART SYSTEM
 // ================================================================
 let cart = [];
-try { cart = JSON.parse(localStorage.getItem('ipl_cart_v5') || '[]'); } catch(e) { cart = []; }
+function getCurrentUserId() {
+  try {
+    const session = JSON.parse(sessionStorage.getItem('ipl_current_user') || localStorage.getItem('ipl_current_user_remember') || 'null');
+    if (session) return session.id || session.email || session.userId || 'guest';
+  } catch(e) {}
+  return 'guest';
+}
+function getCartStorageKey() {
+  return 'ipl_cart_v5_' + getCurrentUserId();
+}
+function loadCart() {
+  try {
+    cart = JSON.parse(localStorage.getItem(getCartStorageKey()) || '[]');
+  } catch(e) {
+    cart = [];
+  }
+  updateCartBadge();
+  renderCartItems();
+}
+function saveCart(){
+  localStorage.setItem(getCartStorageKey(),JSON.stringify(cart));
+  updateCartBadge();
+}
+function clearCart(){
+  cart = [];
+  localStorage.removeItem(getCartStorageKey());
+  updateCartBadge();
+  renderCartItems();
+}
 
 const COUPONS = {
   IPL25:    { type:'percent', val:25, label:'25% OFF' },
@@ -185,7 +213,10 @@ const COUPONS = {
 };
 let activeCoupon = null;
 
-function saveCart(){localStorage.setItem('ipl_cart_v5',JSON.stringify(cart));updateCartBadge();}
+function saveCart(){
+  localStorage.setItem(getCartStorageKey(),JSON.stringify(cart));
+  updateCartBadge();
+}
 function clearCoupon(){
   activeCoupon = null;
   const input = document.getElementById('coupon-input');
@@ -230,9 +261,16 @@ function renderCartItems(){
   if(!list)return;
   if(!cart.length){
     list.innerHTML='<div class="cart-empty">🛒 Your cart is empty<br><small style="color:var(--text-muted);font-size:0.75rem;margin-top:6px;display:block">Browse jerseys, merch or book tickets</small></div>';
-    if(footer)footer.style.display='none';return;
+    if(footer) footer.style.display='none';
+    const ids=[['cart-subtotal-val','₹0'],['cart-discount-val','₹0'],['cart-total-val','₹0']];
+    ids.forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v;});
+    const discRow=document.getElementById('cart-discount-row');
+    if(discRow) discRow.style.display='none';
+    const couponNotice=document.getElementById('cart-coupon-notice');
+    if(couponNotice){ couponNotice.style.display='none'; couponNotice.innerHTML=''; }
+    return;
   }
-  if(footer)footer.style.display='block';
+  if(footer) footer.style.display='block';
   const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const discount=getCouponDiscount(subtotal);
   const total=subtotal-discount;
@@ -299,8 +337,7 @@ function openCheckoutModalFromHistory(fromPop=false) {
   }
   checkoutStep = Math.max(1, checkoutStep);
   renderCheckoutModal();
-  document.getElementById('checkout-modal')?.classList.add('open');
-  document.body.style.overflow='hidden';
+  showCheckoutModal();
 }
 
 function openBuyNowModalFromHistory(flow, fromPop=false) {
@@ -659,22 +696,20 @@ window.openCheckoutPayment = (skipHistory=false)=>{
     try { history.pushState({ page: 'payment' }, '', '#payment'); } catch(e){}
   }
   if(typeof window.openPaymentModal==='function'){
-    openPaymentModal(total,'IPL Purchase',()=>{
+    openPaymentModal(total,'Merchandise Order',()=>{
       // Close payment modal and show order confirmation
       if (typeof window.closePM === 'function') window.closePM();
       checkoutStep=3;
       renderCheckoutModal();
       // Replace history with order-success, clearing cart/payment from stack
       try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
-      document.getElementById('checkout-modal').classList.add('open');
-      document.body.style.overflow='hidden';
+      showCheckoutModal();
     });
   } else {
     checkoutStep=3;
     renderCheckoutModal();
     try { history.replaceState({ page: 'order-success' }, '', '#order-success'); } catch(e){}
-    document.getElementById('checkout-modal').classList.add('open');
-    document.body.style.overflow='hidden';
+    showCheckoutModal();
   }
 };
 
@@ -1263,12 +1298,48 @@ function resetHistoryAfterOrderSuccess(targetSection='portal') {
 }
 
 function proceedCheckout(){
+  // Reload user-specific cart from storage before opening checkout
+  loadCart();
   if(!cart.length){showToast('Your cart is empty!','error');return;}
-  closeCart();
+  // Close cart sidebar directly WITHOUT triggering history.back()
+  // (passing fromPop=true skips the history.back() call that would
+  //  interrupt the checkout flow)
+  closeCart(true);
+  document.getElementById('cart-sidebar')?.classList.remove('open');
+  document.getElementById('cart-overlay')?.classList.remove('open');
+  // Push checkout into history cleanly
+  try { history.pushState({ page: 'checkout' }, '', '#checkout'); } catch(e){}
   checkoutStep=1;
   renderCheckoutModal();
-  document.getElementById('checkout-modal').classList.add('open');
+  showCheckoutModal();
+}
+
+function showCheckoutModal() {
+  const checkoutModal = document.getElementById('checkout-modal');
+  if (!checkoutModal) return;
+  checkoutModal.style.display = '';
+  checkoutModal.classList.add('open');
   document.body.style.overflow='hidden';
+}
+
+function doCheckoutPayment() {
+  const totalText = document.getElementById('cart-total-val')?.textContent || '0';
+  const amount = parseInt((totalText || '0').replace(/[^0-9]/g, ''), 10) || 0;
+  const modal = document.getElementById('checkout-modal');
+  if (modal) {
+    modal.classList.remove('open');
+  }
+  if (typeof openPaymentModal === 'function') {
+    openPaymentModal(amount, 'Merchandise / Jersey Order', function() {
+      if (typeof clearCart === 'function') clearCart();
+      if (typeof closeCart === 'function') closeCart();
+      const msg = document.createElement('div');
+      msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#22c55e;color:#000;padding:14px 28px;border-radius:10px;font-weight:700;font-size:1rem;z-index:9999;font-family:Oswald,sans-serif;letter-spacing:1px';
+      msg.textContent = '✓ ORDER PLACED SUCCESSFULLY!';
+      document.body.appendChild(msg);
+      setTimeout(function(){ msg.remove(); }, 3500);
+    });
+  }
 }
 function renderCheckoutModal(){
   const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
@@ -1302,7 +1373,8 @@ function renderCheckoutModal(){
   } else if(checkoutStep===3){
     const orderId='IPL-'+Math.random().toString(36).slice(2,8).toUpperCase();
     const subtotalPaid = subtotal - discount;
-    cart.forEach(item=>saveOrderToUser({
+    const orderItems = cart.slice();
+    orderItems.forEach(item=>saveOrderToUser({
       orderId, emoji:item.emoji||'📦',
       name:item.name, category:item.variant||'Order',
       qty:item.qty, amount:item.price*item.qty,
@@ -1310,31 +1382,34 @@ function renderCheckoutModal(){
       date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
       status:'Processing'
     },false));
-    const cartItemLines = cart.map((it,i)=>`ITEM ${i+1}      : ${it.name}${it.variant?' ('+it.variant+')':''} x${it.qty} @ ₹${it.price.toLocaleString()}`).join('\n');
+    const cartItemLines = orderItems.map((it,i)=>`ITEM ${i+1}      : ${it.name}${it.variant?' ('+it.variant+')':''} x${it.qty} @ ₹${it.price.toLocaleString()}`).join('\n');
     const orderDate=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    const cartQRText=[
-      '============================',
-      '   CRICKET HUB — IPL 2026  ',
-      '============================',
-      `ORDER ID    : ${orderId}`,
-      `DATE        : ${orderDate}`,
-      `ITEMS       : ${cart.length} item(s)`,
-      cartItemLines,
-      `SUBTOTAL    : ₹${subtotal.toLocaleString()}`,
-      discount>0?`DISCOUNT    : -₹${discount.toLocaleString()}`:'',
-      `TOTAL PAID  : ₹${subtotalPaid.toLocaleString()}`,
-      '----------------------------',
-      'Show QR for delivery.',
-      '============================',
-    ].filter(Boolean).join('\n');
-    cart=[];saveCart();renderCartItems();
+    const cartQRData = buildCartQRData(orderId, orderItems, {
+      date: orderDate,
+      subtotal: '₹' + subtotal.toLocaleString(),
+      discount: discount > 0 ? '₹' + discount.toLocaleString() : '',
+      total: '₹' + subtotalPaid.toLocaleString()
+    });
+    const orderSummaryHtml = orderItems.slice(0,3).map((it,i) =>
+      `<div class="pay-row"><span>Item ${i+1}</span><span>${it.name} x${it.qty}</span></div>`
+    ).join('');
+    cart = [];
+    saveCart();
+    renderCartItems();
     body=`
       <div class="order-success-box">
         <span class="success-icon">🎉</span>
         <h3 style="font-family:Oswald,sans-serif;font-size:1.5rem;margin-bottom:0.5rem">ORDER CONFIRMED!</h3>
-        <p style="color:var(--text-secondary)">Your IPL order has been placed. Delivery in 3–5 business days.</p>
-        <div class="order-id" style="margin:0.75rem 0">Order ID: ${orderId}</div>
-        ${(()=>{const _d=buildCartQRData(orderId,cart.slice(),{date:orderDate,subtotal:'₹'+subtotal.toLocaleString(),discount:discount>0?'₹'+discount.toLocaleString():'',total:'₹'+subtotalPaid.toLocaleString()});return qrBlock(orderId,'cart_order',_d.text,_d.userName);})()}
+        <p style="color:var(--text-secondary);margin-bottom:0.75rem">Your IPL order has been placed. Delivery in 3–5 business days.</p>
+        <div class="order-id">Order ID: ${orderId}</div>
+        <div class="pay-summary-box" style="text-align:left;margin:0.75rem 0">
+          <div class="pay-row"><span>Items</span><span>${orderItems.length} item(s)</span></div>
+          ${orderSummaryHtml}
+          <div class="pay-row"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div>
+          ${discount>0?`<div class="pay-row"><span>Discount</span><span style="color:var(--accent-green)">-₹${discount.toLocaleString()}</span></div>`:''}
+          <div class="pay-row grand"><span>TOTAL PAID</span><span>₹${subtotalPaid.toLocaleString()}</span></div>
+        </div>
+        ${(()=>{return qrBlock(orderId,'cart_order',cartQRData.text,cartQRData.userName);})()}
         <p style="font-size:0.78rem;color:var(--text-muted)">📧 Confirmation sent to your email · 🚚 Show QR for delivery verification</p>
         <div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:center;flex-wrap:wrap">
           <button class="checkout-btn" style="max-width:200px;background:var(--bg-card3);color:var(--text-secondary)" onclick="resetHistoryAfterOrderSuccess('myaccount');switchSection('myaccount',null)">👤 MY ACCOUNT</button>
@@ -1389,9 +1464,9 @@ window.goCheckoutStep=(s)=>{
     }
     
     if (hasError) return; // Don't proceed if validation failed
-    showToast('✅ Details confirmed. Opening secure payment…','success');
+    showToast('✅ Details confirmed. Proceeding to payment…','success');
     checkoutStep = 2;
-    openCheckoutPayment();
+    renderCheckoutModal();
     return;
   }
   
@@ -2018,6 +2093,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   buildJerseyTeamTabs();
   filterJerseys();
   renderMerchGrid();
-  updateCartBadge();
-  renderCartItems();
+  loadCart();
 });

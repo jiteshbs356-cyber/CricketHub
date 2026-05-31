@@ -620,12 +620,17 @@
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .portal-hero { flex-direction: column; padding: 2rem 1.5rem; }
-  .portal-hero-stats { grid-template-columns: repeat(4,1fr); width: 100%; }
+  .portal-hero-stats { grid-template-columns: repeat(2,1fr); width: 100%; }
+  .hs-card { min-width: 0; }
+  .hs-num { font-size: 1.9rem; }
   .tbm-stands-grid { grid-template-columns: repeat(2,1fr); }
   .cart-sidebar { width: 100%; right: -100%; }
   .matches-ticket-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
+  .portal-hero-stats { grid-template-columns: 1fr; }
+  .hs-card { text-align: left; padding: 0.9rem 1rem; }
+  .hs-num { font-size: 1.75rem; }
   .portal-cards-grid { grid-template-columns: 1fr 1fr; }
   .teams-showcase { grid-template-columns: repeat(2,1fr); }
   .payment-methods { grid-template-columns: 1fr 1fr; }
